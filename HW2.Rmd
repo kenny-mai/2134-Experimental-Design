@@ -1,0 +1,97 @@
+---
+title: "HW2"
+author: "Kenny Mai"
+date: "1/17/2021"
+output: pdf_document
+---
+
+```{r}
+# Load packages, import data
+library(car)
+library(gmodels)
+library(readr)
+brew <- read_csv("brew.csv")
+```
+
+```{r}
+# Initialize for a quick loop
+binom <- NA
+for (i in 1:nrow(brew)) {
+  binom[i] <- 100 * (brew[i,3]/100) * (1-(brew[i,3]/100))
+}
+# Percentage of quantities greater than or equal to 3
+sum(binom >= 3)/nrow(brew)
+```
+```{r}
+# ANOVA
+mod <- lm(y~week*water,data=brew)
+brew$water <- as.factor(brew$water)
+brew$week <- as.factor(brew$week)
+summary(aov(lm(y~week*water,data=brew)))
+```
+
+```{r}
+summary(aov(lm(y~week,data=brew)))
+```
+```{r}
+summary(aov(lm(y~week*water,data=brew)))
+```
+
+```{r}
+with(brew, interaction.plot(week,water,y))
+```
+
+```{r}
+# Possible easy solution to 13
+mean(brew$y[brew$water==1&brew$week==5])
+mean(brew$y[brew$water==2&brew$week==5])
+```
+```{r}
+# Using estimable
+estimable(aov(mod), c("water2"=-1, "week5:water2"=-1))
+```
+
+```{r}
+brew2 <- read_csv("brew.csv")
+```
+
+```{r}
+mod2 <- lm(y~week*as.factor(water),data=brew2)
+summary(mod2)
+```
+
+```{r}
+brew$week.f <- factor(brew$week)
+brew$water.f <- factor(brew$water)
+contrasts(brew$week.f) <- contr.poly(5)
+mod3 <- aov(y ~ water.f*week.f, data = brew)
+summary(mod3, split=list(week.f=list("Linear"=1,"quadratic"=2)))
+```
+
+```{r}
+brew$week.f <- factor(brew$week)
+contrasts(brew$week.f) <- contr.poly(5)
+mod4 <- aov(y ~ water*week.f, data = brew)
+summary(mod4, split=list(week.f=list("Linear"=1,"quadratic"=2)))
+```
+
+```{r}
+# Trying to calculate Cohen's F manually
+# Water
+sqrt((1178.1/30)/59.6)
+sqrt((1178.1/30)/((1178.1/30)+59.6))
+sqrt((1321.1/30)/59.6)
+sqrt((1321.1/30)/((1321.1/30)+59.6))
+sqrt((208.9/30)/59.6)
+sqrt((208.9/30)/((208.9/30)+59.6))
+```
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,63 @@
+---
+title: "HW3"
+author: "Kenny Mai"
+date: "1/25/2021"
+output: pdf_document
+---
+
+```{r}
+library(readr)
+library(lme4)
+library(lmerTest)
+```
+
+```{r}
+sport1 <- read_csv("sport1.csv")
+```
+
+```{r}
+sport1$Subject.f <- as.factor(sport1$Subject)
+sport1$Path.f <- as.factor(sport1$Path)
+contrasts(sport1$Path.f) <- contr.poly(3)
+mod1 <- aov(data=sport1, formula=Time~Subject.f+Path.f)
+summary(mod1, split=list(Path.f=list("Linear"=1,"quadratic"=2)))
+
+```
+```{r}
+sigmaRCBD <- 0.9332/(21*2)
+sigmaCBD  <- (0.9332+3.0739)/(3*21)
+sigmaRCBD
+sigmaCBD
+sigmaCBD/sigmaRCBD
+```
+
+```{r}
+summary(aov(data=sport1, formula=Time~Subject.f+Path.f))
+```
+```{r}
+summary(lm(data=sport1, Time~Subject*Path.f))
+```
+
+
+```{r}
+sport2 <- read_csv("sport2.csv")
+```
+```{r}
+sport2$Subject.f <- sport2$Subject
+mod2 <- lmer(Time~Subject.f*as.factor(Path)+(1|Subject.f), data=sport2)
+aov2 <- anova(mod2)
+aov2
+```
+
+```{r}
+copter <- read_csv("copter.csv")
+```
+```{r}
+anova(lmerTest::lmer(time ~ wing*height + (1|subId), data=copter))
+```
+
+
+
+
+
+

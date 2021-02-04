@@ -1,0 +1,94 @@
+---
+title: "HW1"
+author: "Kenny Mai"
+date: "1/11/2021"
+output: pdf_document
+---
+
+Load packages
+```{r}
+library(readr)
+library(dplyr)
+library(moments)
+library(ggplot2)
+library(lsmeans)
+```
+
+Import data
+```{r}
+emotion_new <- read_csv("emotion_new.csv")
+```
+
+# 2
+Summary stats
+```{r}
+# Use dplyr to group by emotion and produce mean, sd, and skewness
+summary <- 
+  emotion_new %>% 
+  group_by(emotion) %>% 
+  summarise(
+    mean = mean(cooperation),
+    sd = sd(cooperation),
+    skew = skewness(cooperation))
+summary
+```
+
+# 3
+Box plots
+```{r}
+# Make box plot
+ggplot(data=emotion_new,aes(x=emotion, y=cooperation, color=emotion)) +
+  geom_boxplot()
+```
+
+# 5
+```{r}
+# Compute the analysis of variance
+res.aov <- aov(cooperation ~ emotion, data = emotion_new)
+# Summary of the analysis
+summary(res.aov)
+```
+Between group SS is 111.2
+Within group SS is 2436
+Total SS is 2547.2
+F ratio is 3.683
+1st degrees of freedom is 3
+2nd degrees of freedom is 242
+
+#8
+```{r}
+res.means <- lsmeans(res.aov, "emotion")
+shame.control <- c(1,0,0,-1)
+guilt.control <- c(1,-1,0,0)
+positive.control <- c(1,0,-1,0)
+shame.guilt <- c(0,1,0,-1)
+shame.positive <- c(0,0,1,-1)
+guilt.positive <- c(0,-1,0,1)
+emotion.contrasts <- list(shame.control,guilt.control,positive.control,shame.guilt,shame.positive,guilt.positive)
+contrast(res.means,emotion.contrasts)
+```
+
+#11
+```{r}
+1-0.95^6
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
